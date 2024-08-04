@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download ВИМ карты</title>
+    <script>
+        function downloadApp() {
+            // Проверка наличия RuStore
+            var rustoreUrl = "rustore://apps/app/appinventor.ai_blue_bear_and_vim.VIM_maps";
+            var rustoreLink = "https://apps.rustore.ru/app/appinventor.ai_blue_bear_and_vim.VIM_maps";
+
+            // Открытие ссылки на RuStore
+            var openRustore = confirm("Хотите открыть RuStore для скачивания приложения?");
+            if (openRustore) {
+                window.location.href = rustoreUrl;
+            } else {
+                window.location.href = "VIM_maps .apk";
+            }
+        }
+    </script>
+</head>
+<body onload="downloadApp()">
+</body>
+</html>
