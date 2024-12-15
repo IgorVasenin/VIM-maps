@@ -2,43 +2,234 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ВИМ карты</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, user-scalable=yes">
+    <title>ВИМ Карты</title>
+    <link rel="icon" href="/favicon/VIMmapslogo.png" type="image/x-icon">
     <style>
-        body {
-            background-color: #0000FF;
-            color: white;
-            font-family: Arial, sans-serif;
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* Отключаем прокрутку */
+        }
+        /* Стили для iframe */
+        iframe {
+            border: 0;
+            height: 100vh; /* Высота 100% от видимой части экрана */
+            width: 100vw;  /* Ширина 100% от видимой части экрана */
+            display: none; /* Скрываем iframe до загрузки */
+        }
+        /* Стили для заставки */
+        #loading-screen {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            flex-direction: column;
+            background-color: #1E90FF; /* Синий фон */
+            height: 100vh; /* Высота 100% от видимой части экрана */
+            width: 100vw;  /* Ширина 100% от видимой части экрана */
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 9999; /* Ставим на передний план */
+        }
+        #loading-screen h1 {
+            font-size: 48px;
             margin: 0;
         }
-        .logo {
-            margin-bottom: 20px;
+        #loading-screen p {
+            font-size: 20px;
+            margin: 0;
         }
-        .button {
-            background-color: #808080;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 10px;
+
+        /* Стили для кнопки меню */
+        #menu-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
             cursor: pointer;
+            width: 30px;
+            height: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        #menu-toggle span {
+            display: block;
+            height: 4px;
+            background-color: #1E90FF; /* Синий цвет линий */
+            border-radius: 2px;
+        }
+        /* Стили для складного меню */
+        #menu {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            z-index: 10000;
+        }
+        #menu a {
+            display: block;
+            padding: 10px 20px;
+            color: #1E90FF;
+            text-decoration: none;
+            font-family: Arial, sans-serif;
+        }
+        #menu a:hover {
+            background-color: #1E90FF;
+            color: white;
+        }
+
+        /* Стили для модального окна */
+        #location-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            z-index: 10001;
+        }
+        #location-modal h2 {
+            margin-top: 0;
+        }
+        #location-modal button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            border: none;
+            background-color: #1E90FF;
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        #location-modal button:hover {
+            background-color: #0056b3;
+        }
+        #location-modal #coordinates {
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        #location-modal #instructions {
+            font-size: 14px;
+            color: #555;
         }
     </style>
 </head>
 <body>
-    <div class="logo">
-        <img src="VIMmapslogo.png" alt="ВИМ карты" width="200">
+   
+    <!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(99128946, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/99128946" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+    <div id="loading-screen">
+        <h1>VIM maps</h1>
+        <p>from VIM system</p>
     </div>
-    <h1>Добро пожаловать на ВИМ карты</h1>
-    <a class="button" href="download.html">Download App</a>
-    <a class="button" href="maps.html">Web Site</a>
+
+    <!-- Кнопка меню -->
+    <div id="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Складное меню -->
+    <div id="menu">
+        <a href="promo/panoram.html">Add</a>
+        <a href="#" id="share-location">Share my location</a>
+        <a href="satellite">Satellite</a>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="location-modal">
+        <h2>Current Location</h2>
+        <div id="coordinates">Latitude: <span id="lat">0</span>, Longitude: <span id="lng">0</span></div>
+        <button id="copy-coordinates">Copy coordinates</button>
+        <div id="instructions">To find these coordinates, enter them in the search by clicking on the magnifying glass icon.</div>
+        <button id="close-modal">Close</button>
+    </div>
+
+    <iframe id="map-frame" src="https://umap.openstreetmap.fr/ru/map/map_1059965"></iframe>
+
+    <script>
+        // Ожидаем полной загрузки iframe
+        window.onload = function() {
+            var iframe = document.getElementById('map-frame');
+            var loadingScreen = document.getElementById('loading-screen');
+
+            iframe.style.display = 'block'; // Показываем iframe
+            loadingScreen.style.display = 'none'; // Скрываем заставку
+        };
+
+        // Логика работы кнопки меню
+        document.getElementById('menu-toggle').onclick = function() {
+            var menu = document.getElementById('menu');
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
+            }
+        };
+
+        // Логика работы кнопки Share location
+        document.getElementById('share-location').onclick = function() {
+            // Получаем текущие координаты
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+
+                // Обновляем текст в модальном окне
+                document.getElementById('lat').textContent = lat;
+                document.getElementById('lng').textContent = lng;
+
+                // Показываем модальное окно
+                document.getElementById('location-modal').style.display = 'block';
+            }, function(error) {
+                alert('Unable to retrieve your location.');
+            });
+        };
+
+        // Логика работы кнопки Copy coordinates
+        document.getElementById('copy-coordinates').onclick = function() {
+            var lat = document.getElementById('lat').textContent;
+            var lng = document.getElementById('lng').textContent;
+            var coordinates = 'Latitude: ' + lat + ', Longitude: ' + lng;
+
+            navigator.clipboard.writeText(coordinates).then(function() {
+                alert('Coordinates copied to clipboard.');
+            }, function() {
+                alert('Failed to copy coordinates.');
+            });
+        };
+
+        // Логика работы кнопки Close в модальном окне
+        document.getElementById('close-modal').onclick = function() {
+            document.getElementById('location-modal').style.display = 'none';
+        };
+    </script>
 </body>
-</html>
+</html> 
